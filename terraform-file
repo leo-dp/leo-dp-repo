@@ -1,0 +1,53 @@
+provider "aws" {
+  region = "us-west-2"  # Choose your preferred region
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI ID in us-west-2
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "MyTerraformInstance"
+  }
+
+  # Key pair for SSH access (Optional - replace with your key pair name)
+  key_name = "my-key-pair"
+
+  # User data for instance initialization (Optional)
+  user_data = <<-EOF
+            #!/bin/bash
+            echo "Hello, World" > /var/www/html/index.html
+            EOF
+}
+
+# Optional security group allowing HTTP and SSH access
+resource "aws_security_group" "allow_ssh_http" {
+  name        = "allow_ssh_http"
+  description = "Allow SSH and HTTP inbound traffic"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "example" {
+  ami                         = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI ID
+  instance_type               = "t2.micro"
+
